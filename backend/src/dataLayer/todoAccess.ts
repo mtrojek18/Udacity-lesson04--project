@@ -100,9 +100,12 @@ export class TodoAccess {
           todoId,
           userId
         },
-        UpdateExpression: "set attachmentUrl = :r",
+        UpdateExpression: "set #attachmentUrl = :attachmentUrl",
         ExpressionAttributeValues: {
-        ":r": attachmentUrl
+        ":attachmentUrl": attachmentUrl
+        },
+        ExpressionAttributeNames: {
+          '#attachmentUrl': 'attachmentUrl'
         },
       }, function(err,data){
           if (err) {
