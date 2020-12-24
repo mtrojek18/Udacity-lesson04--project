@@ -93,6 +93,8 @@ export class TodoAccess {
 
     try {
       logger.info("Run Doc Client Update V2")
+      logger.info("todoId: "+todoId)
+      logger.info("userId: "+userId)
 
       await this.docClient.update({
         TableName: this.todoTable,
@@ -100,13 +102,11 @@ export class TodoAccess {
           todoId,
           userId
         },
-        UpdateExpression: "set #attachmentUrl = :attachmentUrl",
+        UpdateExpression: "add attachmentUrl :attachmentUrl",
         ExpressionAttributeValues: {
         ":attachmentUrl": attachmentUrl
         },
-        ExpressionAttributeNames: {
-          '#attachmentUrl': 'attachmentUrl'
-        },
+          ReturnValues: 'ALL_NEW'
       }, function(err,data){
           if (err) {
             logger.info(err)
