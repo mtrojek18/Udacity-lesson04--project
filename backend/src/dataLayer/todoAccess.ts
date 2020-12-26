@@ -110,10 +110,8 @@ export class TodoAccess {
       }, function(err,data){
           if (err) {
             logger.info(err)
-            console.log(JSON.stringify(err, undefined, 2));
           } else {
             logger.info(data)
-            console.log(JSON.stringify(data, undefined, 2));
       }
       }).promise()   
 
