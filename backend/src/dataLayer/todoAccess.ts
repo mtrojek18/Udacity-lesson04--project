@@ -87,41 +87,81 @@ export class TodoAccess {
   //============================================================
   async updateTodoUrl(todoId: string, userId: string): Promise<void> {
 
-    const attachmentUrl: string = 'https://' + process.env.S3_BUCKET + '.s3.amazonaws.com/' + todoId
+    let attachmentUrl: string = 'https://' + process.env.S3_BUCKET + '.s3.amazonaws.com/' + todoId
 
-    logger.info(attachmentUrl + "attachments url")
+    logger.info(attachmentUrl);
+      
+      try {
+                
+        const updateItemInput = 
+        {
+          "TableName": "TodosTable-dev",
+          "Key": {
+            "userId": {
+              "S": userId
+            },
+            "todoId": {
+              "S": todoId
+            }
+          },
+          "UpdateExpression": " ADD #71600 :71600",
+          "ExpressionAttributeValues": {
+            ":71600": {
+              "SS": [
+                "newurl"
+              ]
+            }
+          },
+          "ExpressionAttributeNames": {
+            "#71600": "attachmentUrl"
+          }
+        }
+        logger.info("updateItemInput: "+updateItemInput);
+        logger.info("Run DocClient Update")
 
-    try {
-      logger.info("Run Doc Client Update V2")
-      logger.info("todoId: "+todoId)
-      logger.info("userId: "+userId)
+        const updateItemOutput = this.docClient.update(updateItemInput).promise();
+        logger.info("UpdatedItemOuput: "+updateItemOutput);
 
-      await this.docClient.update({
-        TableName: this.todoTable,
-        Key: {
-          todoId,
-          userId
-        },
-        UpdateExpression: "add attachmentUrl :attachmentUrl",
-        ExpressionAttributeValues: {
-        ":attachmentUrl": attachmentUrl
-        },
-          ReturnValues: 'ALL_NEW'
-      }, function(err,data){
-          if (err) {
-            logger.info(err)
-          } else {
-            logger.info(data)
+        logger.info("Run Other Update")
+        
+        await this.docClient.update({
+          TableName: this.todoTable,
+          Key: {
+            "userId" : { "S" : userId },
+            "todoId" : { "S" : todoId }
+          },
+          UpdateExpression: "ADD #attachmentUrl :attachmentUrl",
+          ExpressionAttributeValues: {
+            ":attachmentUrl": { 
+              "SS" : [ 
+                "test"
+              ]
+            }
+            },
+          ExpressionAttributeNames: {
+            "#attachmentUrl": "attachmentUrl"
+          }
+            
+        }, function(err,data){
+            if (err) {
+              logger.info(err)
+            } else {
+              logger.info(data)
+        }
+        }).promise()
+
+        logger.info("Other Update Complete")
+  
+
       }
-      }).promise()   
+      catch (err) {
+        console.log("Failure: "+err.message)
+      } finally {
+        console.log("Finally Hit")
+      }
 
-      logger.info("End Doc Client Update")
-    } catch(error)
-     {
-      logger.info("error: "+error)
-    } finally {
-      logger.info("finally hit")
-    }
+      
+    
 
   }
 }

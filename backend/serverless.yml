@@ -121,6 +121,12 @@ functions:
         Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
       - Effect: Allow
         Action:
+          - dynamodb:Query
+          - dynamodb:GetItem
+          - dynamodb:UpdateItem
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}/index/${self:provider.environment.TODOS_ID_INDEX}
+      - Effect: Allow
+        Action:
           - s3:PutObject
           - s3:GetObject
         Resource: arn:aws:s3:::${self:provider.environment.S3_BUCKET}/*
@@ -138,16 +144,44 @@ resources:
         RestApiId:
           Ref: ApiGatewayRestApi
 
+    # #TODO: Add any necessary AWS resources
+    # TodosTable:
+    #   Type: AWS::DynamoDB::Table
+    #   Properties:
+    #     AttributeDefinitions:
+    #       - AttributeName: userId
+    #         AttributeType: S
+    #       - AttributeName: createdAt
+    #         AttributeType: S
+    #       - AttributeName: todoId
+    #         AttributeType: S
+    #     KeySchema:
+    #       - AttributeName: userId
+    #         KeyType: HASH
+    #       - AttributeName: todoId
+    #         KeyType: RANGE
+    #     BillingMode: PAY_PER_REQUEST
+    #     TableName: ${self:provider.environment.TODOS_TABLE}
+    #     LocalSecondaryIndexes:
+    #       - IndexName: ${self:provider.environment.TODOS_ID_INDEX}
+    #         KeySchema:
+    #           - AttributeName: userId
+    #             KeyType: HASH
+    #           - AttributeName: createdAt
+    #             KeyType: RANGE
+    #         Projection:
+    #           ProjectionType: ALL # What attributes will be copied to an index
+
     #TODO: Add any necessary AWS resources
     TodosTable:
       Type: AWS::DynamoDB::Table
       Properties:
         AttributeDefinitions:
+          - AttributeName: todoId
+            AttributeType: S
           - AttributeName: userId
             AttributeType: S
           - AttributeName: createdAt
-            AttributeType: S
-          - AttributeName: todoId
             AttributeType: S
         KeySchema:
           - AttributeName: userId
@@ -165,34 +199,6 @@ resources:
                 KeyType: RANGE
             Projection:
               ProjectionType: ALL # What attributes will be copied to an index
-
-    # # TODO: Add any necessary AWS resources
-    # TodosTable:
-    #   Type: AWS::DynamoDB::Table
-    #   Properties:
-    #     AttributeDefinitions:
-    #       - AttributeName: partitionKey
-    #         AttributeType: S
-    #       - AttributeName: sortKey
-    #         AttributeType: S
-    #       - AttributeName: indexKey
-    #         AttributeType: S
-    #     KeySchema:
-    #       - AttributeName: partitionKey
-    #         KeyType: HASH
-    #       - AttributeName: sortKey
-    #         KeyType: RANGE
-    #     BillingMode: PAY_PER_REQUEST
-    #     TableName: ${self:provider.environment.TODOS_TABLE}
-    #     LocalSecondaryIndexes:
-    #       - IndexName: ${self:provider.environment.TODOS_ID_INDEX}
-    #         KeySchema:
-    #           - AttributeName: partitionKey
-    #             KeyType: HASH
-    #           - AttributeName: indexKey
-    #             KeyType: RANGE
-    #         Projection:
-    #           ProjectionType: ALL # What attributes will be copied to an index
 
     # S3 Bucket
     AttachmentsBucket:

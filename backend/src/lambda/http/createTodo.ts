@@ -10,6 +10,19 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
   const jwtToken = split[1]
 
   const newTodo: CreateTodoRequest = JSON.parse(event.body)
+
+  if (newTodo.name === '') {
+    return {
+      statusCode: 400,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Credentials': true
+      },
+      body: "Name Required!"
+    }
+    
+  }
+
   const todoItem = await createTodo(newTodo, jwtToken)
   
   return {

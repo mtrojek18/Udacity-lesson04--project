@@ -29,7 +29,7 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
   logger.info("Presigned URL: "+presignedUploadUrl)
 
   try {
-    updateTodoUrl(todoId,jwtToken)
+    await updateTodoUrl(todoId,jwtToken)
   } catch (error) {
     logger.info(error)
   }
