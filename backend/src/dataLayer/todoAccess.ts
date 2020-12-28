@@ -92,56 +92,20 @@ export class TodoAccess {
     logger.info(attachmentUrl);
       
       try {
-                
-        const updateItemInput = 
-        {
-          "TableName": "TodosTable-dev",
-          "Key": {
-            "userId": {
-              "S": userId
-            },
-            "todoId": {
-              "S": todoId
-            }
-          },
-          "UpdateExpression": " ADD #71600 :71600",
-          "ExpressionAttributeValues": {
-            ":71600": {
-              "SS": [
-                "newurl"
-              ]
-            }
-          },
-          "ExpressionAttributeNames": {
-            "#71600": "attachmentUrl"
-          }
-        }
-        logger.info("updateItemInput: "+updateItemInput);
-        logger.info("Run DocClient Update")
-
-        const updateItemOutput = this.docClient.update(updateItemInput).promise();
-        logger.info("UpdatedItemOuput: "+updateItemOutput);
-
-        logger.info("Run Other Update")
+             
+        logger.info("todo id: "+todoId)
+        logger.info("user id"+userId)
         
         await this.docClient.update({
           TableName: this.todoTable,
           Key: {
-            "userId" : { "S" : userId },
-            "todoId" : { "S" : todoId }
+             userId,
+             todoId 
           },
-          UpdateExpression: "ADD #attachmentUrl :attachmentUrl",
+          UpdateExpression: "SET attachmentUrl = :attachmentUrl",
           ExpressionAttributeValues: {
-            ":attachmentUrl": { 
-              "SS" : [ 
-                "test"
-              ]
-            }
-            },
-          ExpressionAttributeNames: {
-            "#attachmentUrl": "attachmentUrl"
-          }
-            
+            ":attachmentUrl": attachmentUrl
+          }            
         }, function(err,data){
             if (err) {
               logger.info(err)
@@ -150,19 +114,14 @@ export class TodoAccess {
         }
         }).promise()
 
-        logger.info("Other Update Complete")
+        logger.info("Attachment Update Complete")
   
-
       }
       catch (err) {
         console.log("Failure: "+err.message)
       } finally {
         console.log("Finally Hit")
       }
-
-      
-    
-
   }
 }
 
