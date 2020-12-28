@@ -8,6 +8,10 @@ plugins:
   - serverless-aws-documentation
 
 provider:
+  tracing:
+    lambda: true
+    apiGateway: true
+
   name: aws
   runtime: nodejs10.x
 
